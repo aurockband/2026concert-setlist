@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<!-- This app is unlisted on purpose: the setlist is private-ish and the search engines need no part of it. -->
+<meta name="robots" content="noindex, nofollow">
+<meta name="theme-color" content="#ff4d6d">
+<title>Concert setlist</title>
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icons/icon-192.png">
+<link rel="apple-touch-icon" href="icons/icon-192.png">
+<!-- theme.css is generated from concerts/<slug>/theme.json by tools/build.py. Never edit it by hand. -->
+<link rel="stylesheet" href="theme.css">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<main id="app">
+
+  <!-- Screen 1: the setlist ------------------------------------------------->
+  <section id="view-setlist" hidden>
+    <header class="head">
+      <img id="logo" class="logo" alt="" hidden>
+      <h1 id="title" class="title"></h1>
+      <p id="subtitle" class="subtitle"></p>
+      <p id="date" class="date"></p>
+      <p id="intro" class="intro"></p>
+      <ul id="legend" class="legend" aria-label="Cue legend"></ul>
+    </header>
+
+    <ol id="songs" class="songs"></ol>
+
+    <footer class="toolbar">
+      <button id="font-down" class="tool" type="button" aria-label="Smaller text">A&minus;</button>
+      <button id="font-up" class="tool" type="button" aria-label="Larger text">A+</button>
+      <button id="wake" class="tool" type="button" aria-pressed="false">Keep screen on</button>
+    </footer>
+  </section>
+
+  <!-- Screen 2: one song ---------------------------------------------------->
+  <section id="view-song" hidden>
+    <button id="back" class="back" type="button">&larr; Setlist</button>
+    <h2 id="song-title" class="song-title"></h2>
+    <p id="song-meta" class="song-meta"></p>
+    <div id="song-body" class="song-body"></div>
+    <nav class="pager" aria-label="Song navigation">
+      <button id="prev" class="tool wide" type="button">&larr; Previous</button>
+      <button id="next" class="tool wide" type="button">Next &rarr;</button>
+    </nav>
+  </section>
+
+  <!-- Screen 3: no key / wrong key / nothing to show ------------------------>
+  <section id="view-fallback" class="fallback" hidden>
+    <h2 class="fallback-title">Scan the QR code at the venue</h2>
+    <p class="fallback-text">
+      The setlist is locked with the link. Open this page from the QR code on the
+      poster (or the link the band gave you) and everything works from then on,
+      even without signal.
+    </p>
+    <p id="fallback-detail" class="fallback-detail" hidden></p>
+  </section>
+
+  <p id="loading" class="loading">Loading the setlist&hellip;</p>
+
+</main>
+
+<script src="app.js"></script>
+</body>
+</html>

@@ -1,0 +1,24 @@
+{
+  "name": "\uc624\ub77d\ubc34\ub4dc 2026 \ucf58\uc11c\ud2b8 | AuRock Band 2026 Concert",
+  "short_name": "\uc624\ub77d\ubc34\ub4dc 2026 \ucf58\uc11c",
+  "lang": "ko",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#0b0b0d",
+  "theme_color": "#ff4d6d",
+  "icons": [
+    {
+      "src": "icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}

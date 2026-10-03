@@ -1,0 +1,298 @@
+/* Concert setlist - layout and look.
+ *
+ * Colour / font / spacing knobs live in theme.css, which tools/build.py
+ * generates from concerts/<slug>/theme.json. Change the concert's look by
+ * editing theme.json only; never edit this file for a new concert.
+ * Every variable has a fallback here so the app still renders if theme.css is
+ * missing (e.g. when hacking on the raw app/ folder).
+ */
+
+:root {
+  /* Only the engine's own knobs live here. Colours, fonts, radius and the poster
+     background all come from theme.css, which tools/build.py generates from
+     concerts/<slug>/theme.json with every default already filled in. Do NOT
+     redeclare them here: this :root block is loaded after theme.css, so an
+     equal-specificity declaration would silently win and undo the concert's
+     theme (that is exactly what happened to --poster-image: none). */
+
+  /* Set by the A- / A+ buttons and remembered in localStorage. */
+  --text-scale: 1;
+
+  --tap: 44px;                 /* minimum tap target, per the accessibility rules */
+  --pad: 16px;
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
+}
+
+* { box-sizing: border-box; }
+
+html {
+  /* Everything is sized in rem, so one line scales the whole app for A-/A+. */
+  font-size: calc(16px * var(--text-scale));
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  min-height: 100dvh;
+  font-family: var(--font-body);
+  color: var(--text);
+  background: #0b0b0d;
+  line-height: 1.5;
+}
+
+/* --- poster backdrop ------------------------------------------------------ */
+
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  background-image: var(--poster-image);
+  background-size: var(--poster-fit);
+  background-position: var(--poster-position);
+  background-repeat: no-repeat;
+  filter: blur(var(--poster-blur));
+}
+
+/* The overlay is the single most important legibility control: it darkens the
+   poster so white lyrics stay above 4.5:1 contrast on any artwork. */
+body::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  background: rgba(0, 0, 0, var(--poster-overlay));
+}
+
+/* --- shared bits ---------------------------------------------------------- */
+
+#app {
+  max-width: 40rem;
+  margin: 0 auto;
+  padding: var(--pad) var(--pad) calc(var(--pad) + var(--safe-bottom));
+}
+
+h1, h2, h3 { font-family: var(--font-heading); line-height: 1.2; margin: 0 0 0.4em; }
+
+button {
+  font: inherit;
+  color: inherit;
+  min-height: var(--tap);
+  min-width: var(--tap);
+  padding: 0 0.75em;
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  border-radius: var(--radius);
+  background: rgba(255, 255, 255, 0.08);
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+
+button:active { background: rgba(255, 255, 255, 0.2); }
+
+:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
+
+[hidden] { display: none !important; }
+
+/* --- screen 1: setlist ---------------------------------------------------- */
+
+.head { padding: 8px 0 4px; }
+
+.logo { max-width: 60%; max-height: 96px; margin-bottom: 12px; }
+
+.title {
+  font-size: 2rem;
+  text-shadow: 0 2px 12px rgba(0, 0, 0, 0.8);
+}
+
+.subtitle { margin: 0.2em 0; font-size: 1.1rem; color: var(--text-muted); }
+.date { margin: 0 0 0.6em; color: var(--accent); font-weight: 700; }
+.intro { color: var(--text-muted); }
+
+.legend {
+  list-style: none;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding: 0;
+  margin: 12px 0 20px;
+}
+
+.legend li {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 10px;
+  border-radius: 999px;
+  font-size: 0.85rem;
+  background: var(--surface);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+}
+
+/* Cue icons are single-colour SVG files, used as CSS masks so they can be
+   tinted to match any cue colour, including ones this app has never seen. */
+.cue-icon {
+  display: inline-block;
+  width: 1.3em;
+  height: 1.3em;
+  flex: none;
+  background-color: var(--cue, var(--accent));
+  -webkit-mask: var(--icon) center / contain no-repeat;
+  mask: var(--icon) center / contain no-repeat;
+  /* The icons are black SVG: mask by alpha, not by luminance, or they vanish. */
+  -webkit-mask-source-type: alpha;
+  mask-mode: alpha;
+}
+
+.legend .cue-icon { width: 20px; height: 20px; }
+
+.songs { list-style: none; padding: 0; margin: 0; display: grid; gap: 10px; }
+
+.songs li { margin: 0; }
+
+.songs button {
+  width: 100%;
+  min-height: var(--tap);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  text-align: left;
+  padding: 12px 14px;
+  border-radius: var(--radius);
+  background: var(--surface);
+  border: 1px solid rgba(255, 255, 255, 0.16);
+}
+
+.songs .num {
+  flex: 0 0 2.1em;
+  color: var(--accent);
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+}
+
+.songs .meta { flex: 1 1 auto; min-width: 0; }
+
+.songs .name {
+  display: block;
+  font-family: var(--font-heading);
+  font-weight: 700;
+  font-size: 1.05rem;
+}
+
+.songs .artist { display: block; font-size: 0.85rem; color: var(--text-muted); }
+
+.songs .cues { display: flex; gap: 6px; flex: 0 0 auto; }
+.songs .cues .cue-icon { width: 22px; height: 22px; }
+
+.songs button[aria-current="true"] { border-color: var(--accent); box-shadow: 0 0 0 2px var(--accent) inset; }
+
+/* Encore divider, injected between the two encore groups. */
+.encore {
+  margin: 18px 0 6px;
+  padding: 6px 0;
+  border-top: 2px solid var(--accent);
+  color: var(--accent);
+  font-family: var(--font-heading);
+  font-weight: 800;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  font-size: 0.85rem;
+}
+
+.encore:first-child { border-top: 0; }
+
+.toolbar { display: flex; gap: 8px; margin-top: 24px; }
+
+.tool { border-radius: var(--radius); }
+.tool[aria-pressed="true"] { background: var(--accent); color: #101014; border-color: transparent; }
+.tool.wide { flex: 1 1 0; padding: 0 10px; }
+
+/* --- screen 2: song ------------------------------------------------------- */
+
+.back {
+  margin: 0 0 16px;
+  background: var(--surface);
+  border-color: rgba(255, 255, 255, 0.25);
+}
+
+.song-title { font-size: 1.75rem; }
+.song-meta { margin: 0 0 18px; color: var(--text-muted); }
+
+.song-body { display: grid; gap: 22px; }
+
+.section-label {
+  margin: 0 0 6px;
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+.lyrics {
+  margin: 0;
+  font-size: 1.25rem;              /* 20px at default text scale */
+  line-height: 1.65;
+  white-space: pre-wrap;           /* keep the \n line breaks from concert.json */
+  overflow-wrap: anywhere;         /* long Korean/Japanese lines must not overflow */
+}
+
+/* Cue banner: the loud, obvious "SING ALONG!" block inside a song. */
+.cue {
+  --cue: var(--accent);            /* overridden per cue type below */
+  margin: 4px 0;
+  padding: 14px 16px;
+  border-radius: var(--radius);
+  background: color-mix(in srgb, var(--cue) 22%, rgba(0, 0, 0, 0.55));
+  border: 2px solid var(--cue);
+  color: var(--text);
+}
+
+.cue-head {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 0 0 6px;
+  font-family: var(--font-heading);
+  font-size: 1.35rem;
+  font-weight: 800;
+  letter-spacing: 0.02em;
+  color: var(--cue);
+  text-transform: uppercase;
+}
+
+.cue-head .cue-icon { width: 1.5em; height: 1.5em; color: var(--cue); background-color: var(--cue); }
+.cue .lyrics { font-size: 1.1rem; }
+.cue[data-cue="singalong"] { --cue: var(--cue-singalong); }
+.cue[data-cue="cheer"]     { --cue: var(--cue-cheer); }
+.cue[data-cue="clap"]      { --cue: var(--cue-clap); }
+.cue[data-cue="jump"]      { --cue: var(--cue-jump); }
+
+.pager { display: flex; gap: 8px; margin-top: 28px; }
+
+/* --- screen 3: fallback --------------------------------------------------- */
+
+.fallback {
+  min-height: 60vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 24px 0;
+}
+
+.fallback-title { font-size: 1.6rem; }
+.fallback-text { color: var(--text-muted); }
+.fallback-detail { color: var(--text-muted); font-size: 0.85rem; }
+
+.loading { color: var(--text-muted); padding: 40vh 0; text-align: center; }
+
+/* --- motion / print ------------------------------------------------------- */
+
+@media (prefers-reduced-motion: reduce) {
+  * { animation: none !important; transition: none !important; scroll-behavior: auto !important; }
+}
+
+@media print {
+  .toolbar, .pager, .back, #loading { display: none; }
+  body::before, body::after { display: none; }
+  body { background: #fff; color: #000; }
+}
